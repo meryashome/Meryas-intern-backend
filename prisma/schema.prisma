@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  Int              @id @default(autoincrement())
+  nationalId          String           @unique
+  name                String
+  familyName          String
+  birthDate           String
+  email               String           @unique
+  avatar              String?
+  jobTitle            String
+  role                Role
+  jobStartDate        String
+  managerId           Int?
+  manager             User?          @relation("ManagerEmployees", fields: [managerId], references: [id])
+  employees           User[]          @relation("ManagerEmployees")
+  helpdeskRequests    HelpdeskRequest[]
+  freeDaysRequests    FreeDaysRequest[]
+  password            String
+  phoneNumber         String?
+  freeDays            Int
+  extraDays           Int?
+  cityOrTown          String?
+  country             String?
+
+  createdAt           DateTime         @default(now())
+}
+
+model HelpdeskRequest {
+  id          Int       @id @default(autoincrement())
+  type        HelpdeskType
+  category    String
+  description String
+  userId      Int
+  user        User       @relation(fields: [userId], references: [id])
+  status      RequestStatus @default(PENDING)
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model FreeDaysRequest {
+  id          Int       @id @default(autoincrement())
+  startDate   DateTime
+  endDate     DateTime
+  description String
+  userId      Int
+  user        User       @relation(fields: [userId], references: [id])
+  status      RequestStatus @default(PENDING)
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model WorkTimeEvent {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  eventType String    // "start" or "stop"
+  eventTime DateTime  @default(now())
+  day       DateTime  // Used for grouping events by day
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  EMPLOYEE
+}
+
+enum HelpdeskType {
+  IT
+  HR
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  DECLINED
+}
