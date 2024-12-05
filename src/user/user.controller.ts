@@ -25,6 +25,10 @@ export class UserController {
     async getAllManagers() {
         return this.userService.getAllManagers();
     }
+    @Get('todayBirthDay')
+    async getAllTodayBirthDay() {
+        return this.userService.getAllTodayBirthDay();
+    }
 
     @Get(':id')
     async getUserById(@Param('id') id: string) {

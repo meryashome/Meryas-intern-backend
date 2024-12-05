@@ -19,6 +19,10 @@ export class UserService {
         return this.prisma.user.findMany({where: {role: 'MANAGER'}});
     }
 
+    async getAllTodayBirthDay() {
+        return this.prisma.user.findMany({where: {birthDate: new Date().toISOString().split('T')[0]}});
+    }
+
     async getUserById(id: number) {
         return this.prisma.user.findUnique({ where: { id } });
     }
