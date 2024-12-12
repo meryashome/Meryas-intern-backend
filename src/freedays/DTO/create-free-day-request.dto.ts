@@ -1,10 +1,10 @@
 import { IsDateString, IsString, IsNotEmpty } from 'class-validator';
 
 export class CreateFreeDayRequestDto {
-    @IsDateString()
+    @IsString()
     startDate: string;
 
-    @IsDateString()
+    @IsString()
     endDate: string;
 
     @IsString()

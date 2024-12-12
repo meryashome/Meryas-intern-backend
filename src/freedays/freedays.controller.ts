@@ -9,7 +9,7 @@ export class FreeDaysController {
     constructor(private freeDaysService: FreeDaysService) {}
 
     // Endpoint to create a new free day request
-    @Post('create')
+    @Post('create/:userId')
     async createRequest(
         @Body() createFreeDayRequestDto: CreateFreeDayRequestDto,
         @Param('userId') userId: number,
@@ -18,9 +18,9 @@ export class FreeDaysController {
     }
 
     // Endpoint to get all free day requests for a user
-    @Get('requests/:userId')
-    async getRequests(@Param('userId') userId: number) {
-        return this.freeDaysService.getRequests(userId);
+    @Get('requests')
+    async getRequests() {
+        return this.freeDaysService.getRequests();
     }
 
     // Endpoint to update the status of a free day request
@@ -28,8 +28,7 @@ export class FreeDaysController {
     async updateRequestStatus(
         @Param('requestId') requestId: number,
         @Body('status') status: RequestStatus,
-        @Param('role') role: string,
     ) {
-        return this.freeDaysService.updateRequestStatus(requestId, status, role);
+        return this.freeDaysService.updateRequestStatus(requestId, status);
     }
 }

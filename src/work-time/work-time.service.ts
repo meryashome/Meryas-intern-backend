@@ -137,8 +137,8 @@ export class WorkTimeService {
 
         // Get all employees and managers
         const users = await this.prisma.user.findMany({
-            where: { role: { in: ['EMPLOYEE', 'MANAGER'] } }, // Adjust roles if necessary
-            select: { id: true, name: true, role: true },
+            where: { role: { in: ['EMPLOYEE', 'MANAGER'] } },
+            select: { id: true, name: true, role: true, familyName: true },
         });
 
         // Get all tracking events for the users
@@ -154,24 +154,31 @@ export class WorkTimeService {
         const groupedTracking = {};
         for (const event of trackingEvents) {
             const userId = event.userId;
-            const eventDate = this.toTunisiaTime(event.eventTime).toISOString().split('T')[0];
+            const eventDate = event.eventTime.toISOString().split('T')[0];
 
-            if (!groupedTracking[eventDate]) {
-                groupedTracking[eventDate] = {};
+            if (!Array.isArray(groupedTracking[eventDate])) {
+                groupedTracking[eventDate] = [];
             }
-            if (!groupedTracking[eventDate][userId]) {
+
+            let userTracking = groupedTracking[eventDate].find(user => user.userId === userId);
+
+            if (!userTracking) {
                 const user = users.find((u) => u.id === userId);
-                groupedTracking[eventDate][userId] = {
-                    userName: user?.name || `User ${userId}`,
+                userTracking = {
+                    userId: userId,
+                    userName: user?.name + ' ' + user?.familyName || `User ${userId}`,
                     role: user?.role || 'Unknown',
                     events: [],
                 };
+                groupedTracking[eventDate].push(userTracking);
             }
-            groupedTracking[eventDate][userId].events.push(event);
+
+            userTracking.events.push(event);
         }
 
         return groupedTracking;
     }
+
 
     /**
      * Service to retrieve the last tracked event for a user on a specific day
